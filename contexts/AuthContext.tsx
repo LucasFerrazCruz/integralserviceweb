@@ -25,11 +25,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const carregarUsuario = useCallback(async () => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      setLoading(false)
+      return
+    }
+
     try {
       const { data } = await api.get('/auth/me')
       setUsuario(data)
     } catch {
       setUsuario(null)
+      localStorage.removeItem('token')
+      delete api.defaults.headers.common.Authorization
     } finally {
       setLoading(false)
     }
